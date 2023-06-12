@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
@@ -21,18 +21,19 @@ missing_values_after = merged_data[['volume (ml)', '% of eTIV']].isnull().sum()
 print("\nMissing Values After Handling:\n", missing_values_after)
 
 ##encoding
-
-# Encode categorical variables using one-hot encoding
-categorical_columns = ['structure', 'type', 'hemisphere', 'diagnosis', 'sex', 'MRI', 'EEG']
-encoded_data = pd.get_dummies(merged_data, columns=categorical_columns)
+# Encode categorical variables using label encoding
+label_encoder = LabelEncoder()
+merged_data['sex_encoded'] = label_encoder.fit_transform(merged_data['sex'])
+merged_data['diagnosis_encoded'] = label_encoder.fit_transform(merged_data['diagnosis'])
+merged_data['MRI_results_encoded'] = label_encoder.fit_transform(merged_data['MRI'])
+merged_data['EEG_results_encoded'] = label_encoder.fit_transform(merged_data['EEG'])
 
 # Identify the features (X) and target variable (y)
-features = ['volume (ml)', '% of eTIV', 'sex_Female', 'sex_Male', 'MRI Results_Negative', 'MRI Results_Positive',
-            'EEG Results_Negative', 'EEG Results_Positive']
-target = 'diagnosis'
+features = ['volume (ml)', '% of eTIV', 'sex_encoded', 'MRI_results_encoded', 'EEG_results_encoded']
+target = 'diagnosis_encoded'
 
-X = encoded_data[features]
-y = encoded_data[target]
+X = merged_data[features]
+y = merged_data[target]
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
