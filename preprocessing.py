@@ -1,5 +1,8 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
 
 # Read the merged data from Excel into a DataFrame
 merged_data = pd.read_excel('merged_data.xlsx')
@@ -19,14 +22,32 @@ print("\nMissing Values After Handling:\n", missing_values_after)
 
 ##encoding
 
-# Perform one-hot encoding on categorical variables
+# Encode categorical variables using one-hot encoding
 categorical_columns = ['structure', 'type', 'hemisphere', 'diagnosis', 'sex', 'MRI', 'EEG']
 encoded_data = pd.get_dummies(merged_data, columns=categorical_columns)
 
-# Apply label encoding on 'Volume (ml)' and '% of eTIV'
-label_encoder = LabelEncoder()
-encoded_data['volume (ml)'] = label_encoder.fit_transform(merged_data['volume (ml)'])
-encoded_data['% of eTIV'] = label_encoder.fit_transform(merged_data['% of eTIV'])
+# Identify the features (X) and target variable (y)
+features = ['volume (ml)', '% of eTIV', 'sex_Female', 'sex_Male', 'MRI Results_Negative', 'MRI Results_Positive',
+            'EEG Results_Negative', 'EEG Results_Positive']
+target = 'diagnosis'
 
-# Print the encoded data for verification
-print(encoded_data)
+X = encoded_data[features]
+y = encoded_data[target]
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create an instance of Logistic Regression model
+model = LogisticRegression()
+
+# Train the model using the training data
+model.fit(X_train, y_train)
+
+# Use the trained model to make predictions on the testing data
+y_pred = model.predict(X_test)
+
+# Compare the predicted labels with the actual labels
+report = classification_report(y_test, y_pred)
+
+# Print the classification report
+print(report)
