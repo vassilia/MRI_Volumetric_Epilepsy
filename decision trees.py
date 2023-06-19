@@ -52,3 +52,5 @@ report = classification_report(y_test, y_pred)
 
 # Print the classification report
 print(report)
+class_labels = merged_data['diagnosis_encoded'].unique()
+print(class_labels)

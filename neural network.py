@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from sklearn.metrics import classification_report
+import numpy as np
 
 # Read the merged data from Excel into a DataFrame
 merged_data = pd.read_excel('merged_data.xlsx')
@@ -16,10 +17,6 @@ print("Missing Values:\n", missing_values)
 # Fill missing values with mean or other appropriate values
 merged_data['volume (ml)'] = merged_data['volume (ml)'].fillna(merged_data['volume (ml)'].mean())
 merged_data['% of eTIV'] = merged_data['% of eTIV'].fillna(merged_data['% of eTIV'].mean())
-
-# Verify if missing values are handled
-missing_values_after = merged_data[['volume (ml)', '% of eTIV']].isnull().sum()
-print("\nMissing Values After Handling:\n", missing_values_after)
 
 ## Encoding ##
 # Encode categorical variables using label encoding
@@ -54,13 +51,19 @@ _, accuracy = model.evaluate(X_test, y_test, verbose=0)
 print("Accuracy:", accuracy)
 
 # Use the trained model to make predictions on the testing data
-y_pred = model.predict_classes(X_test)
+y_pred_prob = model.predict(X_test)
+y_pred = np.argmax(y_pred_prob, axis=1)
 
 # Convert the encoded predictions back to original labels
 predicted_labels = label_encoder.inverse_transform(y_pred)
 
+# Inverse transform the actual labels
+y_test_labels = label_encoder.inverse_transform(y_test)
+
 # Compare the predicted labels with the actual labels
-report = classification_report(y_test, predicted_labels)
+report = classification_report(y_test_labels, predicted_labels)
 
 # Print the classification report
 print(report)
+
+
