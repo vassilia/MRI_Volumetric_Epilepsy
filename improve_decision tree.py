@@ -108,61 +108,20 @@ print(report)
 
 # Assuming you have the true labels (y_test) and predicted labels (y_pred)
 # Calculate the confusion matrix
-#cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
 
 # Get the class labels from the unique values in y_test and y_pred
-#classes = sorted(set(y_test) | set(y_pred))
+classes = sorted(set(y_test) | set(y_pred))
 
 # Create a DataFrame from the confusion matrix
-#cm_df = pd.DataFrame(cm, index=classes, columns=classes)
+cm_df = pd.DataFrame(cm, index=classes, columns=classes)
 
 # Plot the confusion matrix using a heatmap
-#plt.figure(figsize=(8, 6))
-#sns.heatmap(cm_df, annot=True, cmap='Blues')
-#plt.title('Confusion Matrix')
-#plt.xlabel('Predicted')
-#plt.ylabel('Actual')
-#plt.show()
-
-
-import pandas as pd
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import label_binarize
-from itertools import cycle
-
-# Assuming you have the true labels (y_test) and predicted probabilities (y_pred_prob) for all classes
-# Binarize the labels
-y_test_bin = label_binarize(y_test, classes=[3, 4, 1, 2, 0])  # Replace class_labels with your actual class labels
-
-# Get the class labels from the label encoder
-class_labels = label_encoder.inverse_transform([3, 4, 1, 2, 0])  # Replace label_encoder with your actual label encoder
-
-# Calculate the false positive rate (FPR), true positive rate (TPR), and AUC for each class
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
-n_classes = len(class_labels)  # Number of classes
-
-for i in range(n_classes):
-    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_pred[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
-
-# Plot the ROC curves for each class
 plt.figure(figsize=(8, 6))
-colors = cycle(['blue', 'red', 'green', 'orange', 'purple'])  # Adjust the number of colors as per your classes
-
-for i, color in zip(range(n_classes), colors):
-    plt.plot(fpr[i], tpr[i], color=color, lw=2,
-             label='ROC curve of class {0} (AUC = {1:0.2f})'.format(class_labels[i], roc_auc[i]))
-
-plt.plot([0, 1], [0, 1], color='black', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
-plt.legend(loc='lower right')
+sns.heatmap(cm_df, annot=True, cmap='Blues')
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
 plt.show()
 
 
